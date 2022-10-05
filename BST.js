@@ -16,15 +16,53 @@ function tree(arr) {
     arr.sort((a, b) => a - b)
     const cleanArray = [...new Set(arr)]
     let root = buildTree(cleanArray, 0, cleanArray.length-1)
-    // const search = (data) => {
-    //     if (root === null || root.data === data) {
-    //         return root
-    //     }
-    //     if (root.data < data) {
-    //         return search(root.right, data)
-    //     }
-    //     return search(root.left, data)
-    // }
+
+    const minValue = (root) => {
+        let min = root.data
+        while (root.left != null) {
+            min = root.left.data
+            root = root.left
+        }
+        return min
+    }
+
+    const deleteRec = (root, data) => {
+        if (root === null) {
+            return root
+        }
+
+        if (data < root.data) {
+            root.left = deleteRec(root.left, data)
+        } else if (data > root.data) {
+            root.right = deleteRec(root.right, data)
+        } else {
+            if (root.left === null) {
+                return root.right
+            } else if (root.right === null) {
+                return root.left
+            } else {
+                root.data = minValue(root.right)
+                root.right = deleteRec(root.right, root.data)
+            }
+        }
+        return root
+    }
+
+    const findRec = (root, data) => {
+        if (root === null) {
+            return false
+        }
+        if (root.data === data) {
+            return true
+        }
+        if (root.data < data) {
+            return findRec(root.right, data)
+        }
+        if (root.data > data) {
+            return findRec(root.left, data)
+        }
+    }
+
     return {
         root: function () {
             return root
@@ -55,8 +93,13 @@ function tree(arr) {
             } else {
                 prev.right = newNode
             }
+        },
+        delete: function (data) {
+            root = deleteRec(root, data)
+        },
+        find: function (data) {
+            return findRec(root, data)
         }
-        // delete, find (search), levelOrder...
     }
 }
 
@@ -74,18 +117,14 @@ function buildTree(arr, start, end) {
 
 // SAMPLE DATA
 
-function numbers(a, b) {
-    return a - b
-}
-
 const sample = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 const newTree = tree(sample)
-newTree.insert(1)
+prettyPrint(newTree.root())
+
+// console.log(newTree.find(33))
 
 // console.log(cleanArray)
 // const mainRoot = buildTree(cleanArray, 0, cleanArray.length-1)
 
+// prettyPrint(newTree.root())
 
-prettyPrint(newTree.root())
-
-// prettyPrint(mainRoot)
