@@ -49,11 +49,8 @@ function tree(arr) {
     }
 
     const findRec = (root, data) => {
-        if (root === null) {
-            return false
-        }
-        if (root.data === data) {
-            return true
+        if (root === null || root.data === data) {
+            return root
         }
         if (root.data < data) {
             return findRec(root.right, data)
@@ -99,6 +96,83 @@ function tree(arr) {
         },
         find: function (data) {
             return findRec(root, data)
+        },
+        // Breath-first LevelOrder
+        levelOrder: function (callbackFn) {
+            if (!root) {
+                return root
+            }
+            const queue = [root]
+            const result = []
+            while(queue.length) {
+                const current = queue[0]
+                callbackFn ? callbackFn(current) : result.push(current.data)
+                if (current.left) {
+                    queue.push(current.left)
+                }
+                if (current.right) {
+                    queue.push(current.right)
+                }
+                queue.shift()
+            }
+            return result
+        },
+        // Depth-first Preorder, Inorder, Postorder
+        // Preorder ROOT-LEFT-RIGHT
+        preorder: function (callbackFn, node = root, result = []) {
+            if (!node) {
+                return node
+            }
+            callbackFn ? callbackFn(node) : result.push(node.data)
+            this.preorder(callbackFn, node.left, result)
+            this.preorder(callbackFn, node.right, result)
+
+            return result
+        },
+        // Inorder LEFT-ROOT-RIGHT
+        inorder: function (callbackFn, node = root, result = []) {
+            if (!node) {
+                return node
+            }
+            this.inorder(callbackFn, node.left, result)
+            callbackFn ? callbackFn(node) : result.push(node.data)
+            this.inorder(callbackFn, node.right, result)
+
+            return result
+        },
+        // Postorder LEFT-RIGHT-ROOT
+        postorder: function (callbackFn, node = root, result = []) {
+            if (!node) {
+                return node
+            }
+            this.postorder(callbackFn, node.left, result)
+            this.postorder(callbackFn, node.right, result)
+            callbackFn ? callbackFn(node) : result.push(node.data)
+
+            return result
+        },
+        height: function (node) {
+            if (!node) {
+                return 0
+            }
+            const leftHeight = this.height(node.left)
+            const rightHeight = this.height(node.right)
+
+            return Math.max(leftHeight, rightHeight) + 1
+        },
+        depth: function (node, current = root) {
+            if (!node || !current) {
+                return 0
+            }
+            if (current.data > node.data) {
+                return this.depth(node, current.left) + 1
+            }
+            if (current.data < node.data) {
+                return this.depth(node, current.right) + 1
+            }
+            if (current.data === node.data) {
+                return 1
+            }
         }
     }
 }
@@ -120,6 +194,17 @@ function buildTree(arr, start, end) {
 const sample = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 const newTree = tree(sample)
 prettyPrint(newTree.root())
+
+console.log(newTree.depth(newTree.find(6345)))
+newTree.depth(newTree.find(77))
+
+
+// newTree.height(newTree.root())
+// console.log(newTree.height(newTree.find(77)))
+
+// console.log(newTree.postorder())
+// newTree.postorder((a) => a.data *= 2)
+// prettyPrint(newTree.root())
 
 // console.log(newTree.find(33))
 
