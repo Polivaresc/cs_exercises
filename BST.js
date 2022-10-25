@@ -60,6 +60,19 @@ function tree(arr) {
         }
     }
 
+    const traverse = (root, arr) => {
+        if (arr) {
+            arr.push(root.data)
+        }
+        if (root.left !== null) {
+            traverse(root.left, arr)
+        }
+        if (root.right !== null) {
+            traverse(root.right, arr)
+        }
+        return arr
+    }
+
     return {
         root: function () {
             return root
@@ -173,6 +186,25 @@ function tree(arr) {
             if (current.data === node.data) {
                 return 1
             }
+        },
+        isBalanced: function (root) {
+            if (root === null) {
+                return true
+            }
+            const leftSubtree = root.left
+            const rightSubtree = root.right
+
+            return Math.abs(this.height(leftSubtree) - this.height(rightSubtree)) <= 1
+        },
+        rebalance: function () {
+            if (this.isBalanced(root)) {
+                return root
+            }
+            let rebalancedArray = []
+            rebalancedArray = traverse(root, rebalancedArray)
+            const balancedTree = buildTree(rebalancedArray)
+
+            return balancedTree.root
         }
     }
 }
@@ -195,9 +227,12 @@ const sample = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 const newTree = tree(sample)
 prettyPrint(newTree.root())
 
-console.log(newTree.depth(newTree.find(6345)))
-newTree.depth(newTree.find(77))
+console.log(newTree.rebalance())
 
+// console.log(newTree.isBalanced(newTree.root()))
+
+// console.log(newTree.depth(newTree.find(6345)))
+// newTree.depth(newTree.find(77))
 
 // newTree.height(newTree.root())
 // console.log(newTree.height(newTree.find(77)))
