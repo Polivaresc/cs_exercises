@@ -8,10 +8,8 @@ const node = (data = null, left = null, right = null) => {
 // Build tree from array
 function buildTree(arr, start, end) {
     if (start > end) return null
-
     const mid = Math.floor((start + end)/2)
     let root = node(arr[mid])
-
     root.left = buildTree(arr, start, mid-1)
     root.right = buildTree(arr, mid+1, end)
     return root
@@ -22,14 +20,16 @@ function buildTree(arr, start, end) {
 
 const tree = (arr) => {
 
-    function root() {
+    function initializeRoot() {
         arr.sort((a, b) => a - b)
         const cleanArray = [...new Set(arr)]
         return buildTree(cleanArray, 0, cleanArray.length-1)
     }
 
+    let root = initializeRoot()
+
     function insert(data) {
-        let newNode = node(data)
+        const newNode = node(data)
         if (!root) {
             root = newNode
             return
@@ -37,15 +37,15 @@ const tree = (arr) => {
         let prev = null
         let temp = root
         while (temp) {
-            if (temp.data > data) {
+            if (temp?.data > data) {
                 prev = temp
                 temp = temp.left
             }
-            if (temp.data < data) {
+            if (temp?.data < data) {
                 prev = temp
                 temp = temp.right
             }
-            if (temp.data === data) {
+            if (temp?.data === data) {
                 return //do not insert a repeated value
             }
         }
@@ -69,7 +69,6 @@ const tree = (arr) => {
         if (root === null) {
             return root
         }
-
         if (data < root.data) {
             root.left = __removeRec(root.left, data)
         } else if (data > root.data) {
@@ -136,9 +135,8 @@ const tree = (arr) => {
             return node
         }
         callbackFn ? callbackFn(node) : result.push(node.data)
-        this.preorder(callbackFn, node.left, result)
-        this.preorder(callbackFn, node.right, result)
-
+        preorder(callbackFn, node.left, result)
+        preorder(callbackFn, node.right, result)
         return result
     }
 
@@ -147,10 +145,9 @@ const tree = (arr) => {
         if (!node) {
             return node
         }
-        this.inorder(callbackFn, node.left, result)
+        inorder(callbackFn, node.left, result)
         callbackFn ? callbackFn(node) : result.push(node.data)
-        this.inorder(callbackFn, node.right, result)
-
+        inorder(callbackFn, node.right, result)
         return result
     }
 
@@ -159,10 +156,9 @@ const tree = (arr) => {
         if (!node) {
             return node
         }
-        this.postorder(callbackFn, node.left, result)
-        this.postorder(callbackFn, node.right, result)
+        postorder(callbackFn, node.left, result)
+        postorder(callbackFn, node.right, result)
         callbackFn ? callbackFn(node) : result.push(node.data)
-
         return result
     }
 
@@ -170,9 +166,8 @@ const tree = (arr) => {
         if (!node) {
             return 0
         }
-        const leftHeight = this.height(node.left)
-        const rightHeight = this.height(node.right)
-
+        const leftHeight = height(node.left)
+        const rightHeight = height(node.right)
         return Math.max(leftHeight, rightHeight) + 1
     }
 
@@ -181,24 +176,23 @@ const tree = (arr) => {
             return 0
         }
         if (current.data > node.data) {
-            return this.depth(node, current.left) + 1
+            return depth(node, current.left) + 1
         }
         if (current.data < node.data) {
-            return this.depth(node, current.right) + 1
+            return depth(node, current.right) + 1
         }
         if (current.data === node.data) {
             return 1
         }
     }
 
-    function isBalanced(root) {
+    function isBalanced() {
         if (root === null) {
             return true
         }
         const leftSubtree = root.left
         const rightSubtree = root.right
-
-        return Math.abs(this.height(leftSubtree) - this.height(rightSubtree)) <= 1
+        return Math.abs(height(leftSubtree) - height(rightSubtree)) <= 1
     }
 
     function __traverse (root, arr) {
@@ -220,13 +214,14 @@ const tree = (arr) => {
         }
         let rebalancedArray = []
         rebalancedArray = __traverse(root, rebalancedArray)
-        const balancedTree = buildTree(rebalancedArray)
-
-        return balancedTree.root
+        root = buildTree(rebalancedArray, 0, rebalancedArray.length-1)
     }
 
     // Function provided by The Odin project
-    function prettyPrint (node, prefix = '', isLeft = true) {
+    function prettyPrint (node = null, prefix = '', isLeft = true) {
+        if (!node) {
+            node = root
+        }
         if (node.right !== null) {
             prettyPrint(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
         }
@@ -256,6 +251,28 @@ const tree = (arr) => {
 
 // SAMPLE DATA
 
-const sample = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
+function getRandomLength() {
+    const maxLength = 30
+    const minLength = 10
+    return Math.floor(Math.random() * (maxLength - minLength)) + minLength
+}
+
+function getRandomArray (len = getRandomLength()) {
+    const randomArray = []
+    const maxNumber = 100
+    for (let i = 0; i < len; i ++) {
+        randomArray.push(Math.floor(Math.random() * maxNumber))
+    }
+    console.log(randomArray)
+    return randomArray
+}
+
+
+// const sample = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
+// const newTree = tree(sample)
+// newTree.prettyPrint(newTree.root())
+
+const sample = getRandomArray()
+
 const newTree = tree(sample)
-newTree.prettyPrint(newTree.root())
+newTree.prettyPrint()
