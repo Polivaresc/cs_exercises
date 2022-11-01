@@ -1,10 +1,9 @@
 const knightsProject = require('./knights_project')
-const knight = knightsProject.knight()
+const knightFactory = knightsProject.knightFactory()
 const gameBoard = knightsProject.gameBoard()
-const moves = knightsProject.knightMoves()
 
 test('knight exists', () => {
-    expect(knight).toStrictEqual({ coordinate: [0, 0] })
+    expect(knightFactory.position).toStrictEqual([0, 0])
 })
 
 test('gameBoard creates 8x8 board', () => {
@@ -14,3 +13,12 @@ test('gameBoard creates 8x8 board', () => {
     expect(gameBoard[70]).toBeUndefined()
 })
 
+test('get next moves', () => {
+    const nextMoves = knightFactory.nextMoves()
+    expect(nextMoves).toStrictEqual([[2, 1], [1, 2]])
+})
+
+test('returns shortest path', () => {
+    expect(knightsProject.knightMoves([4, 3], [5, 3])).toStrictEqual([[ 4, 3 ], [ 2, 2 ], [ 4, 1 ], [ 5, 3 ]])
+    expect(knightsProject.knightMoves([4, 3], [4, 3])).toStrictEqual([[ 4, 3 ]])
+})
